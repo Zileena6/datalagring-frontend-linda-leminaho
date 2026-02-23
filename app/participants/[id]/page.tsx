@@ -23,7 +23,7 @@ const Participant = async ({ params }: { params: Promise<{ id: string }> }) => {
           )}
         </div>
       ) : (
-        <p>Student</p>
+        <p>Participant</p>
       )}
     </div>
   );

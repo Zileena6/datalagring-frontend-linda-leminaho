@@ -25,11 +25,11 @@ export type Participant = {
 export type Course = {
   id: string;
   courseCode: string;
-  courseType: CourseType;
-  courseTypeName: CourseTypeName;
   courseName: string;
-  courseDescription: string;
+  description: string;
   rowVersion: string;
+  courseType: string;
+  courseTypeName: string;
 };
 
 export type Location = {
@@ -49,6 +49,6 @@ export type CourseInstance = {
   endDate: string;
   capacity: number;
   instructors: Participant[];
-  approvedEnrollmentsCount: number;
+  confirmedEnrollmentsCount: number;
   rowVersion: string;
 };

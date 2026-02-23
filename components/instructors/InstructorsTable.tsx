@@ -1,3 +1,5 @@
+'use client';
+
 import { participantService } from '@/utils/action';
 import Link from 'next/link';
 import {
@@ -9,10 +11,21 @@ import {
   TableHeader,
   TableRow,
 } from '../ui/table';
-import { useQuery } from '@tanstack/react-query';
-import { Edit, Trash2 } from 'lucide-react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Trash2 } from 'lucide-react';
+
+import CDialog from '@/components/dialog/CDialog';
+import { buildParticipantEdit } from '@/components/forms/fieldBuilders';
+
+import type {
+  UpdateParticipantDTO,
+  UpdateParticipantFormValues,
+} from '@/utils/types/dto';
+import CreateInstructorDialog from './CreateInstructorDialog';
 
 const InstructorsTable = () => {
+  const queryClient = useQueryClient();
+
   const {
     data: instructors = [],
     isPending,
@@ -23,10 +36,19 @@ const InstructorsTable = () => {
     queryFn: ({ signal }) => participantService.getAllInstructors(signal),
   });
 
+  const updateMutation = useMutation({
+    mutationFn: ({ id, dto }: { id: string; dto: UpdateParticipantDTO }) =>
+      participantService.update(id, dto),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['participants', 'instructors'],
+      });
+    },
+  });
+
   const isAbort = error instanceof DOMException && error.name === 'AbortError';
 
   if (isPending) return <div>Loading...</div>;
-
   if (isAbort) return null;
 
   if (isError)
@@ -48,32 +70,75 @@ const InstructorsTable = () => {
             <TableHead>Phone Number</TableHead>
           </TableRow>
         </TableHeader>
+
         <TableBody>
-          {instructors.map(
-            ({ id, firstName, lastName, email, phoneNumber }) => (
-              <TableRow key={id}>
+          {instructors.map((instructor) => {
+            const { fields, initialValues } = buildParticipantEdit(instructor);
+
+            return (
+              <TableRow key={instructor.id}>
                 <TableCell>
-                  <Link href={`/participants/${id}`}>{firstName}</Link>
+                  <Link href={`/participants/${instructor.id}`}>
+                    {instructor.firstName}
+                  </Link>
                 </TableCell>
                 <TableCell>
-                  <Link href={`/participants/${id}`}>{lastName}</Link>
+                  <Link href={`/participants/${instructor.id}`}>
+                    {instructor.lastName}
+                  </Link>
                 </TableCell>
                 <TableCell>
-                  <Link href={`/participants/${id}`}>{email}</Link>
+                  <Link href={`/participants/${instructor.id}`}>
+                    {instructor.email}
+                  </Link>
                 </TableCell>
                 <TableCell>
-                  <Link href={`/participants/${id}`}>{phoneNumber}</Link>
+                  <Link href={`/participants/${instructor.id}`}>
+                    {instructor.phoneNumber}
+                  </Link>
                 </TableCell>
 
                 <TableCell className='flex gap-2'>
-                  <Trash2 className='text-muted-foreground' />
-                  <Edit className='text-muted-foreground' />
+                  <Trash2 />
+
+                  <CDialog<UpdateParticipantFormValues>
+                    title='Edit instructor'
+                    description="Make changes to the instructor. Click save when you're done."
+                    fields={fields}
+                    initialValues={initialValues}
+                    onSave={(values) => {
+                      const dto: UpdateParticipantDTO = {
+                        rowVersion: values.rowVersion,
+                        firstName: values.firstName,
+                        lastName: values.lastName,
+                        email: values.email,
+                        phoneNumber: values.phoneNumber.trim()
+                          ? values.phoneNumber
+                          : null,
+                      };
+
+                      updateMutation.mutate({ id: values.id, dto });
+                    }}
+                  />
                 </TableCell>
               </TableRow>
-            ),
-          )}
+            );
+          })}
         </TableBody>
       </Table>
+
+      <div className='w-full flex justify-end px-4'>
+        <CreateInstructorDialog />
+      </div>
+
+      {updateMutation.isError ? (
+        <div className='mt-4'>
+          Error:{' '}
+          {updateMutation.error instanceof Error
+            ? updateMutation.error.message
+            : 'Unknown error'}
+        </div>
+      ) : null}
     </>
   );
 };

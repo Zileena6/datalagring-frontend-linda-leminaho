@@ -1,4 +1,6 @@
-import { courseInstancesService } from '@/utils/action';
+'use client';
+
+import { courseInstanceService } from '@/utils/action';
 import {
   Table,
   TableBody,
@@ -10,7 +12,10 @@ import {
 } from '../ui/table';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { Trash2, Edit } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
+
+import CreateCourseInstanceDialog from './CreateCourseInstanceDialog';
+import EditCourseInstanceDialog from './EditCourseInstanceDialog';
 
 const CourseInstancesTable = () => {
   const {
@@ -20,7 +25,7 @@ const CourseInstancesTable = () => {
     error,
   } = useQuery({
     queryKey: ['courseInstances'],
-    queryFn: ({ signal }) => courseInstancesService.getAll(signal),
+    queryFn: ({ signal }) => courseInstanceService.getAll(signal),
   });
 
   if (isPending) return <div>Loading...</div>;
@@ -33,7 +38,7 @@ const CourseInstancesTable = () => {
     );
 
   return (
-    <>
+    <div>
       <Table>
         <TableCaption>Course Instances</TableCaption>
         <TableHeader>
@@ -45,63 +50,60 @@ const CourseInstancesTable = () => {
             <TableHead>Location</TableHead>
             <TableHead>Instructors</TableHead>
             <TableHead>Capacity</TableHead>
-            <TableHead>Approved students</TableHead>
+            <TableHead>Confirmed students</TableHead>
+            <TableHead />
           </TableRow>
         </TableHeader>
+
         <TableBody>
-          {courseInstances.map(
-            ({
-              id,
-              course: { id: courseId, courseName },
-              courseCode,
-              startDate,
-              endDate,
-              location: { id: locationId, locationName },
-              instructors,
-              capacity,
-              approvedEnrollmentsCount,
-            }) => (
-              <TableRow key={id}>
-                <TableCell>
-                  <Link href={`/courses/${courseId}`}>{courseName}</Link>
-                </TableCell>
-                <TableCell>
-                  <Link href={''}>{courseCode}</Link>
-                </TableCell>
-                <TableCell>
-                  <Link href={''}>{startDate}</Link>
-                </TableCell>
-                <TableCell>
-                  <Link href={''}>{endDate}</Link>
-                </TableCell>
-                <TableCell>
-                  <Link href={''}>{locationName}</Link>
-                </TableCell>
-                <TableCell>
-                  {instructors.map(({ id, firstName, lastName }) => (
-                    <div key={id}>
-                      <Link href={`/participants/${id}`} className='my-1'>
-                        {firstName} {lastName}
-                      </Link>
-                    </div>
-                  ))}
-                </TableCell>
-                <TableCell>
-                  <Link href={''}>{capacity}</Link>
-                </TableCell>
-                <TableCell>
-                  <Link href={''}>{approvedEnrollmentsCount}</Link>
-                </TableCell>
-                <TableCell className='flex gap-3'>
-                  <Trash2 className='text-muted-foreground' />
-                  <Edit className='text-muted-foreground' />
-                </TableCell>
-              </TableRow>
-            ),
-          )}
+          {courseInstances.map((instance) => (
+            <TableRow key={instance.id}>
+              <TableCell>
+                <Link href={`/courses/${instance.course.id}`}>
+                  {instance.course.courseName}
+                </Link>
+              </TableCell>
+
+              <TableCell>{instance.courseCode}</TableCell>
+
+              <TableCell>
+                {new Date(instance.startDate).toLocaleString('sv-SE')}
+              </TableCell>
+
+              <TableCell>
+                {new Date(instance.endDate).toLocaleString('sv-SE')}
+              </TableCell>
+
+              <TableCell>{instance.location.locationName}</TableCell>
+
+              <TableCell>
+                {instance.instructors.map(({ id, firstName, lastName }) => (
+                  <div key={id} className='my-1'>
+                    <Link href={`/participants/${id}`}>
+                      {firstName} {lastName}
+                    </Link>
+                  </div>
+                ))}
+              </TableCell>
+
+              <TableCell>{instance.capacity}</TableCell>
+
+              <TableCell>{instance.confirmedEnrollmentsCount}</TableCell>
+
+              <TableCell className='flex gap-3'>
+                <Trash2 />
+                {/* ✅ skicka HELA instance */}
+                <EditCourseInstanceDialog instance={instance} />
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
-    </>
+
+      <div className='flex justify-end mt-4'>
+        <CreateCourseInstanceDialog triggerText='New Course Instance' />
+      </div>
+    </div>
   );
 };
 
