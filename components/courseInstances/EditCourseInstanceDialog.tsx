@@ -77,11 +77,9 @@ const EditCourseInstanceDialog = ({
         const dto: UpdateCourseInstanceDTO = {
           rowVersion: values.rowVersion,
 
-          // ✅ BACKEND VILL HA ID:n
           courseId: values.courseId,
           locationId: values.locationId,
 
-          // ✅ optional i backend, men vi skickar dem ändå
           startDate: new Date(values.startDate).toISOString(),
           endDate: new Date(values.endDate).toISOString(),
 

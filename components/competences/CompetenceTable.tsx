@@ -1,6 +1,6 @@
 'use client';
 
-import { locationService } from '@/utils/action';
+import { competenceService } from '@/utils/action';
 import Link from 'next/link';
 import {
   Table,
@@ -15,40 +15,41 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Trash2 } from 'lucide-react';
 
 import CDialog from '@/components/dialog/CDialog';
-import { buildLocationEdit } from '@/components/forms/fieldBuilders';
+import { buildCompetenceEdit } from '@/components/forms/fieldBuilders';
 
 import type {
+  UpdateCompetenceDTO,
+  UpdateCompetenceFormValues,
   UpdateLocationDTO,
-  UpdateLocationFormValues,
 } from '@/utils/types/dto';
-import CreateLocationDialog from './CreateLocationDialog';
+import CreateCompetenceDialog from './CreateCompetenceDialog';
 import { toast } from 'sonner';
 
 const LocationsTable = () => {
   const queryClient = useQueryClient();
 
   const {
-    data: locations = [],
+    data: competences = [],
     isPending,
     isError,
     error,
   } = useQuery({
-    queryKey: ['locations'],
-    queryFn: ({ signal }) => locationService.getAll(signal),
+    queryKey: ['competences'],
+    queryFn: ({ signal }) => competenceService.getAll(signal),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, dto }: { id: string; dto: UpdateLocationDTO }) =>
-      locationService.update(id, dto),
+      competenceService.update(id, dto),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['locations'] });
+      queryClient.invalidateQueries({ queryKey: ['competences'] });
     },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => locationService.remove(id),
+    mutationFn: (id: string) => competenceService.remove(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['locations'] });
+      queryClient.invalidateQueries({ queryKey: ['competences'] });
     },
   });
 
@@ -64,22 +65,22 @@ const LocationsTable = () => {
   return (
     <>
       <Table className='w-4xl'>
-        <TableCaption>Locations</TableCaption>
+        <TableCaption>Competences</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>City</TableHead>
+            <TableHead>Field</TableHead>
           </TableRow>
         </TableHeader>
 
         <TableBody>
-          {locations.map((location) => {
-            const { fields, initialValues } = buildLocationEdit(location);
+          {competences.map((competence) => {
+            const { fields, initialValues } = buildCompetenceEdit(competence);
 
             return (
-              <TableRow key={location.id}>
-                <TableCell>
-                  <Link href={`/locations/${location.id}`}>
-                    {location.locationName}
+              <TableRow key={competence.id}>
+                <TableCell className=''>
+                  <Link href={`/competences/${competence.id}`}>
+                    {competence.competenceName}
                   </Link>
                 </TableCell>
 
@@ -87,11 +88,11 @@ const LocationsTable = () => {
                   <Trash2
                     className='cursor-pointer'
                     onClick={async () => {
-                      const ok = window.confirm('Delete this location?');
+                      const ok = window.confirm('Delete this competence?');
                       if (!ok) return;
 
                       await toast.promise(
-                        deleteMutation.mutateAsync(location.id),
+                        deleteMutation.mutateAsync(competence.id),
                         {
                           loading: 'Deleting...',
                           success: 'Location deleted',
@@ -102,18 +103,18 @@ const LocationsTable = () => {
                     }}
                   />
 
-                  <CDialog<UpdateLocationFormValues>
+                  <CDialog<UpdateCompetenceFormValues>
                     title='Edit location'
                     description='Change the city name and click save.'
                     fields={fields}
                     initialValues={initialValues}
                     onSave={(values) => {
-                      const dto: UpdateLocationDTO = {
+                      const dto: UpdateCompetenceDTO = {
                         rowVersion: values.rowVersion,
-                        locationName: values.locationName,
+                        name: values.name,
                       };
                       updateMutation.mutate({ id: values.id, dto });
-                      console.log(values.rowVersion, values.locationName);
+                      console.log(values.rowVersion, values.name);
                     }}
                   />
                 </TableCell>
@@ -124,17 +125,8 @@ const LocationsTable = () => {
       </Table>
 
       <div className='flex justify-center pl-30'>
-        <CreateLocationDialog />
+        <CreateCompetenceDialog />
       </div>
-
-      {updateMutation.isError ? (
-        <div className='mt-4'>
-          Error:{' '}
-          {updateMutation.error instanceof Error
-            ? updateMutation.error.message
-            : 'Unknown error'}
-        </div>
-      ) : null}
     </>
   );
 };

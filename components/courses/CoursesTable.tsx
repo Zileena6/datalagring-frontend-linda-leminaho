@@ -24,6 +24,7 @@ import type {
   UpdateCourseDTO,
   UpdateCourseFormValues,
 } from '@/utils/types/dto';
+import { toast } from 'sonner';
 
 const CoursesTable = () => {
   const queryClient = useQueryClient();
@@ -49,6 +50,13 @@ const CoursesTable = () => {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => courseService.remove(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['courses'] });
+    },
+  });
+
   if (isPending) return <div>Loading</div>;
 
   if (isError)
@@ -61,14 +69,14 @@ const CoursesTable = () => {
   return (
     <>
       <Table>
-        <TableCaption>All Courses</TableCaption>
+        <TableCaption>Courses</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>Course</TableHead>
             <TableHead>Course Type</TableHead>
             <TableHead>Course Type Name</TableHead>
             <TableHead>Course Code</TableHead>
-            <TableHead>Course Description</TableHead>
+            <TableHead>Description</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -105,20 +113,36 @@ const CoursesTable = () => {
                 </TableCell>
 
                 <TableCell className='flex gap-2'>
-                  <Trash2 />
+                  <Trash2
+                    className='cursor-pointer'
+                    onClick={async () => {
+                      const ok = window.confirm('Delete this course?');
+                      if (!ok) return;
+
+                      await toast.promise(
+                        deleteMutation.mutateAsync(course.id),
+                        {
+                          loading: 'Deleting...',
+                          success: 'Course deleted',
+                          error: (e) =>
+                            e instanceof Error ? e.message : 'Failed to delete',
+                        },
+                      );
+                    }}
+                  />
 
                   <CDialog<UpdateCourseFormValues>
                     title='Edit course'
-                    description="Edit the course. Click save when you're done."
+                    description="Edit course, and click save when you're done."
                     fields={fields}
                     initialValues={initialValues}
                     onSave={async (values) => {
                       const dto: UpdateCourseDTO = {
-                        rowVersion: values.rowVersion,
-                        courseName: values.courseName,
                         courseCode: values.courseCode,
+                        courseName: values.courseName,
                         description: values.description,
                         courseType: values.courseType,
+                        rowVersion: values.rowVersion,
                       };
 
                       await updateMutation.mutateAsync({ id: values.id, dto });
@@ -132,21 +156,21 @@ const CoursesTable = () => {
 
         <TableFooter>
           <TableRow>
-            <TableCell colSpan={5} className='text-center'>
-              Click on row to view course details
+            <TableCell colSpan={5} className=''>
+              Click on a row to view course details
             </TableCell>
           </TableRow>
         </TableFooter>
       </Table>
-
-      <CreateCourseDialog
-        trigger={
-          <Button className='bg-foreground text-accent-foreground hover:bg-muted hover:text-muted-foreground'>
-            Add course
-          </Button>
-        }
-      />
-
+      <div className='flex justify-end'>
+        <CreateCourseDialog
+          trigger={
+            <Button className='bg-foreground text-accent-foreground hover:bg-muted hover:text-muted-foreground'>
+              Add course
+            </Button>
+          }
+        />
+      </div>
       {updateMutation.isError ? (
         <div className='mt-4'>
           Update error:{' '}

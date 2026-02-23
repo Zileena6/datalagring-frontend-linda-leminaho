@@ -3,8 +3,8 @@ import { Suspense } from 'react';
 
 export default function Home() {
   return (
-    <main className='flex flex-col w-full grow'>
-      <div className='min-h-14 flex items-center flex-col grow py-20 justify-center'>
+    <main className='flex flex-col w-full grow p-10'>
+      <div className='min-h-14 flex items-center flex-col grow justify-center'>
         <Suspense fallback={null}>
           <TableContainer />
         </Suspense>

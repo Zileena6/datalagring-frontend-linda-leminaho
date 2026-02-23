@@ -7,6 +7,7 @@ import CourseInstancesTable from '../courseInstances/CourseInstancesTable';
 import LocationsTable from '../locations/LocationsTable';
 import InstructorsTable from '../instructors/InstructorsTable';
 import StudentsTable from '../students/StudentsTable';
+import CompetenceTable from '../competences/CompetenceTable';
 
 const TableContainer = () => {
   const searchParams = useSearchParams();
@@ -24,9 +25,10 @@ const TableContainer = () => {
         <TabsList>
           <TabsTrigger value='courses'>Courses</TabsTrigger>
           <TabsTrigger value='courseInstances'>CourseInstances</TabsTrigger>
-          <TabsTrigger value='locations'>Locations</TabsTrigger>
+          <TabsTrigger value='competences'>Competences</TabsTrigger>
           <TabsTrigger value='instructors'>Instructors</TabsTrigger>
           <TabsTrigger value='students'>Students</TabsTrigger>
+          <TabsTrigger value='locations'>Locations</TabsTrigger>
         </TabsList>
 
         <TabsContent value='courses'>
@@ -35,6 +37,10 @@ const TableContainer = () => {
 
         <TabsContent value='courseInstances'>
           <CourseInstancesTable />
+        </TabsContent>
+
+        <TabsContent value='competences'>
+          <CompetenceTable />
         </TabsContent>
 
         <TabsContent value='locations'>

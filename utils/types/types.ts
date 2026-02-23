@@ -1,6 +1,7 @@
 export type ParticipantRole = 'Student' | 'Instructor';
 export type CourseType = 'BC' | 'AC';
 export type CourseTypeName = 'Basic Course' | 'Advanced Course';
+export type EnrollmentStatus = 'Pending' | 'Confirmed' | 'Cancelled';
 
 export type Competence = {
   id: string;
@@ -44,11 +45,27 @@ export type CourseInstance = {
   id: string;
   course: Course;
   courseCode: string;
-  location: Location;
   startDate: string;
   endDate: string;
   capacity: number;
+  location: Location;
   instructors: Participant[];
   confirmedEnrollmentsCount: number;
   rowVersion: string;
+};
+
+export type UpdateParticipantDTO = {
+  firstName?: string | null;
+  lastName?: string | null;
+  email?: string | null;
+  phoneNumber?: string | null;
+  rowVersion: string;
+};
+
+export type Enrollment = {
+  id: string;
+  studentId: string;
+  studentName: string;
+  status: EnrollmentStatus;
+  enrolledAt: string;
 };

@@ -61,7 +61,7 @@ const CreateCourseInstanceDialog = ({
       description='Pick existing course/location/instructors, set dates and capacity.'
       trigger={
         <Button
-          className='bg-foreground text-accent-foreground hover:bg-muted hover:text-muted-foreground'
+          className='bg-foreground text-accent-foreground hover:bg-muted hover:text-muted-foreground cursor-pointer'
           disabled={loading}
         >
           {loading ? 'Loading…' : triggerText}

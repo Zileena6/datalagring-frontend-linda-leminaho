@@ -11,13 +11,17 @@ import {
   TableRow,
 } from '../ui/table';
 import Link from 'next/link';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Trash2 } from 'lucide-react';
 
 import CreateCourseInstanceDialog from './CreateCourseInstanceDialog';
 import EditCourseInstanceDialog from './EditCourseInstanceDialog';
+import { toast } from 'sonner';
+import ManageEnrollmentsDialog from './ManageEnrollmentsDialog';
 
 const CourseInstancesTable = () => {
+  const queryClient = useQueryClient();
+
   const {
     data: courseInstances = [],
     isPending,
@@ -26,6 +30,14 @@ const CourseInstancesTable = () => {
   } = useQuery({
     queryKey: ['courseInstances'],
     queryFn: ({ signal }) => courseInstanceService.getAll(signal),
+    staleTime: 1000 * 5,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => courseInstanceService.remove(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['courseInstances'] });
+    },
   });
 
   if (isPending) return <div>Loading...</div>;
@@ -51,6 +63,7 @@ const CourseInstancesTable = () => {
             <TableHead>Instructors</TableHead>
             <TableHead>Capacity</TableHead>
             <TableHead>Confirmed students</TableHead>
+            <TableHead>Enrollments</TableHead>
             <TableHead />
           </TableRow>
         </TableHeader>
@@ -91,8 +104,28 @@ const CourseInstancesTable = () => {
               <TableCell>{instance.confirmedEnrollmentsCount}</TableCell>
 
               <TableCell className='flex gap-3'>
-                <Trash2 />
-                {/* ✅ skicka HELA instance */}
+                <ManageEnrollmentsDialog
+                  courseInstanceId={instance.id}
+                  rowVersion={instance.rowVersion}
+                />
+                <Trash2
+                  className='cursor-pointer'
+                  onClick={async () => {
+                    const ok = window.confirm('Delete this courseInstance?');
+                    if (!ok) return;
+
+                    await toast.promise(
+                      deleteMutation.mutateAsync(instance.id),
+                      {
+                        loading: 'Deleting...',
+                        success: 'Student deleted',
+                        error: (e) =>
+                          e instanceof Error ? e.message : 'Failed to delete',
+                      },
+                    );
+                  }}
+                />
+
                 <EditCourseInstanceDialog instance={instance} />
               </TableCell>
             </TableRow>

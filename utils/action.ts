@@ -1,4 +1,11 @@
-import { Participant, Course, CourseInstance, Location } from './types/types';
+import {
+  Participant,
+  Course,
+  CourseInstance,
+  Location,
+  Enrollment,
+  Competence,
+} from './types/types';
 import { ApiError, ProblemDetails } from './types/api';
 import {
   mockCourse,
@@ -6,21 +13,27 @@ import {
   mockLocation,
   mockParticipant,
 } from './mock-data';
-import { UpdateCourseInstanceDTO } from './types/dto';
+import {
+  AddCompetenceDTO,
+  CreateCompetenceDTO,
+  EnrollStudentDTO,
+  UpdateCourseInstanceDTO,
+  UpdateEnrollmentStatusDTO,
+} from './types/dto';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
 
 function mockResponse<T>(endpoint: string): T {
-  if (endpoint.includes('/attendees/students')) {
+  if (endpoint.includes('/participants/students')) {
     return mockParticipant.filter((a) => a.role === 'Student') as T;
   }
 
-  if (endpoint.includes('/attendees/instructors')) {
+  if (endpoint.includes('/participants/instructors')) {
     return mockParticipant.filter((a) => a.role === 'Instructor') as T;
   }
 
-  if (endpoint.includes('/attendees')) {
+  if (endpoint.includes('/participants')) {
     return mockParticipant as T;
   }
 
@@ -32,7 +45,7 @@ function mockResponse<T>(endpoint: string): T {
     return mockLocation as T;
   }
 
-  if (endpoint.includes('/courseSessions')) {
+  if (endpoint.includes('/courseInstances')) {
     return mockInstances as T;
   }
 
@@ -95,6 +108,18 @@ export const participantService = {
       signal: ct,
     }),
 
+  getByEmail: (email: string, signal?: AbortSignal) =>
+    apiFetch<Participant>(
+      `/participants/by-email?email=${encodeURIComponent(email)}`,
+      { signal },
+    ),
+
+  addCompetenceToInstructor: (id: string, dto: AddCompetenceDTO) =>
+    apiFetch<{ message: string }>(`/participants/${id}/competences`, {
+      method: 'POST',
+      body: JSON.stringify(dto),
+    }),
+
   create: (data: unknown) =>
     apiFetch<Participant>('/participants', {
       method: 'POST',
@@ -105,6 +130,33 @@ export const participantService = {
     apiFetch<Participant>(`/participants/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(data),
+    }),
+
+  remove: (id: string) =>
+    apiFetch<void>(`/participants/${id}`, {
+      method: 'DELETE',
+    }),
+};
+
+export const competenceService = {
+  getAll: (signal?: AbortSignal) =>
+    apiFetch<Competence[]>('/competences', { signal }),
+
+  create: (dto: CreateCompetenceDTO) =>
+    apiFetch<Competence>('/competences', {
+      method: 'POST',
+      body: JSON.stringify(dto),
+    }),
+
+  update: (id: string, dto: unknown) =>
+    apiFetch<Competence>(`/competences/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(dto),
+    }),
+
+  remove: (id: string) =>
+    apiFetch<void>(`/competences/${id}`, {
+      method: 'DELETE',
     }),
 };
 
@@ -121,6 +173,11 @@ export const courseService = {
     apiFetch<Course>(`/courses/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(data),
+    }),
+
+  remove: (id: string) =>
+    apiFetch<void>(`/courses/${id}`, {
+      method: 'DELETE',
     }),
 };
 
@@ -139,6 +196,11 @@ export const locationService = {
       method: 'PATCH',
       body: JSON.stringify(data),
     }),
+
+  remove: (id: string) =>
+    apiFetch<void>(`/locations/${id}`, {
+      method: 'DELETE',
+    }),
 };
 
 export const courseInstanceService = {
@@ -146,7 +208,7 @@ export const courseInstanceService = {
     apiFetch<CourseInstance[]>('/courseInstances', { signal: ct }),
 
   create: (data: unknown) =>
-    apiFetch('/courseSessions', {
+    apiFetch('/courseInstances', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
@@ -156,4 +218,33 @@ export const courseInstanceService = {
       method: 'PATCH',
       body: JSON.stringify(data),
     }),
+
+  remove: (id: string) =>
+    apiFetch<void>(`/courseSessions/${id}`, {
+      method: 'DELETE',
+    }),
+
+  enrollStudent: (courseInstanceId: string, dto: EnrollStudentDTO) =>
+    apiFetch<void>(`/courseInstances/${courseInstanceId}/enrollments`, {
+      method: 'POST',
+      body: JSON.stringify(dto),
+    }),
+
+  getEnrollments: (courseInstanceId: string, signal?: AbortSignal) =>
+    apiFetch<Enrollment[]>(`/courseInstances/${courseInstanceId}/enrollments`, {
+      signal,
+    }),
+
+  setEnrollmentStatus: (
+    courseInstanceId: string,
+    studentId: string,
+    dto: UpdateEnrollmentStatusDTO,
+  ) =>
+    apiFetch<void>(
+      `/courseInstances/${courseInstanceId}/enrollment/${studentId}/status`,
+      {
+        method: 'PUT',
+        body: JSON.stringify(dto),
+      },
+    ),
 };

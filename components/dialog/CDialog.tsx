@@ -36,9 +36,11 @@ const CDialog = <TValues extends Record<string, string>>({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger ? (
-          <span className='cursor-pointer'>{trigger}</span>
+          <span className='bg-foreground text-accent-foreground hover:bg-muted hover:text-muted-foreground cursor-pointer'>
+            {trigger}
+          </span>
         ) : (
-          <Edit className='cursor-pointer' />
+          <Edit className='bg-foreground text-accent-foreground hover:bg-muted hover:text-muted-foreground cursor-pointer' />
         )}
       </DialogTrigger>
 

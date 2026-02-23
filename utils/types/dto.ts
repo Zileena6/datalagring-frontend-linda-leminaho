@@ -1,5 +1,6 @@
-import { ParticipantRole, CourseType } from './types';
+import { ParticipantRole, CourseType, EnrollmentStatus } from './types';
 
+// MARK: Participants
 export type UpdateParticipantDTO = {
   firstName?: string | null;
   lastName?: string | null;
@@ -39,6 +40,38 @@ export type CreateInstructorFormValues = {
   phoneNumber: string;
 };
 
+// MARK: Competences
+export type CreateCompetenceDTO = {
+  name: string;
+};
+
+export type CreateCompetenceFormValues = {
+  name: string;
+};
+
+export type UpdateCompetenceDTO = {
+  name?: string | null;
+  rowVersion: string;
+};
+
+export type UpdateCompetenceFormValues = {
+  id: string;
+  name: string;
+  rowVersion: string;
+};
+
+export type AddCompetenceDTO = {
+  competenceName: string;
+  rowVersion: string;
+};
+
+export type AddCompetenceFormValues = {
+  competenceName: string;
+  rowVersion: string;
+  instructorId: string;
+};
+
+// MARK: Locations
 export type UpdateLocationDTO = {
   locationName?: string | null;
   rowVersion: string;
@@ -58,20 +91,23 @@ export type CreateLocationFormValues = {
   locationName: string;
 };
 
+// MARK: Courses
 export type UpdateCourseDTO = {
   courseCode?: string | null;
   courseName?: string | null;
   description?: string | null;
-  courseType?: CourseType | null;
   rowVersion: string;
+
+  courseType?: CourseType | null;
 };
 
 export type UpdateCourseFormValues = {
   id: string;
-  rowVersion: string;
   courseCode: string;
   courseName: string;
   description: string;
+  rowVersion: string;
+
   courseType: CourseType;
   courseTypeName: string;
 };
@@ -79,29 +115,33 @@ export type UpdateCourseFormValues = {
 export type CreateCourseDTO = {
   courseName: string;
   description: string;
+
   courseType: CourseType;
 };
 
 export type CreateCourseFormValues = {
   courseName: string;
   description: string;
+
   courseType: CourseType | '';
 };
 
+// MARK: CourseInstances
 export type CreateCourseInstanceDTO = {
   startDate: string;
   endDate: string;
-  capacity: number;
   courseCode: string;
+  capacity: number;
   locationName: string;
+
   instructorIds: string[];
 };
 
 export type CreateCourseInstanceFormValues = {
   startDate: string;
   endDate: string;
-  capacity: string;
   courseCode: string;
+  capacity: string;
   locationName: string;
   instructorIds: string;
 };
@@ -109,8 +149,8 @@ export type CreateCourseInstanceFormValues = {
 export type UpdateCourseInstanceDTO = {
   startDate?: string | null;
   endDate?: string | null;
-  locationId?: string | null;
   capacity?: number | null;
+  locationId?: string | null;
   rowVersion: string;
 
   courseId?: string | null;
@@ -125,5 +165,30 @@ export type UpdateCourseInstanceFormValues = {
   capacity: string;
   locationId: string;
   rowVersion: string;
+
   instructorIds: string;
+};
+
+// MARK: Enrollments
+export type EnrollStudentDTO = {
+  studentId: string;
+  rowVersion: string;
+};
+
+export type UpdateEnrollmentStatusDTO = {
+  newStatus: EnrollmentStatus;
+  rowVersion: string;
+};
+
+export type EnrollStudentToInstanceFormValues = {
+  studentId: string;
+  courseInstanceId: string;
+  rowVersion: string;
+};
+
+export type UpdateEnrollmentStatusFormValues = {
+  courseInstanceId: string;
+  studentId: string;
+  newStatus: EnrollmentStatus | '';
+  rowVersion: string;
 };

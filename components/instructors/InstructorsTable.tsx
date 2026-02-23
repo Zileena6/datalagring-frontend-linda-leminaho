@@ -22,6 +22,9 @@ import type {
   UpdateParticipantFormValues,
 } from '@/utils/types/dto';
 import CreateInstructorDialog from './CreateInstructorDialog';
+import { toast } from 'sonner';
+import AddCompetenceDialog from './AddCompetenceDialog';
+import InstructorInfoDialog from './InstructorInfoDialog';
 
 const InstructorsTable = () => {
   const queryClient = useQueryClient();
@@ -39,6 +42,15 @@ const InstructorsTable = () => {
   const updateMutation = useMutation({
     mutationFn: ({ id, dto }: { id: string; dto: UpdateParticipantDTO }) =>
       participantService.update(id, dto),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['participants', 'instructors'],
+      });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => participantService.remove(id),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['participants', 'instructors'],
@@ -99,11 +111,27 @@ const InstructorsTable = () => {
                 </TableCell>
 
                 <TableCell className='flex gap-2'>
-                  <Trash2 />
+                  <Trash2
+                    className='cursor-pointer'
+                    onClick={async () => {
+                      const ok = window.confirm('Delete this instructor?');
+                      if (!ok) return;
+
+                      await toast.promise(
+                        deleteMutation.mutateAsync(instructor.id),
+                        {
+                          loading: 'Deleting...',
+                          success: 'Instructor deleted',
+                          error: (e) =>
+                            e instanceof Error ? e.message : 'Failed to delete',
+                        },
+                      );
+                    }}
+                  />
 
                   <CDialog<UpdateParticipantFormValues>
                     title='Edit instructor'
-                    description="Make changes to the instructor. Click save when you're done."
+                    description="Make changes to the instructor, and click save when you're done."
                     fields={fields}
                     initialValues={initialValues}
                     onSave={(values) => {
@@ -119,6 +147,14 @@ const InstructorsTable = () => {
 
                       updateMutation.mutate({ id: values.id, dto });
                     }}
+                  />
+                  <AddCompetenceDialog
+                    instructorId={instructor.id}
+                    rowVersion={instructor.rowVersion}
+                  />
+                  <InstructorInfoDialog
+                    instructorId={instructor.id}
+                    triggerText='View'
                   />
                 </TableCell>
               </TableRow>
