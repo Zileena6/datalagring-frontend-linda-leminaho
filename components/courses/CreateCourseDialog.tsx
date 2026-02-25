@@ -35,12 +35,10 @@ const CreateCourseDialog = ({ trigger }: Props) => {
       fields={fields}
       initialValues={initialValues}
       onSave={async (values) => {
-        if (!values.courseType) throw new Error('Select a course type');
-
         const dto: CreateCourseDTO = {
+          courseCode: values.courseCode.trim(),
           courseName: values.courseName.trim(),
           description: values.description.trim(),
-          courseType: values.courseType,
         };
 
         await createMutation.mutateAsync(dto);

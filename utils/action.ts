@@ -14,7 +14,7 @@ import {
   mockParticipant,
 } from './mock-data';
 import {
-  AddCompetenceDTO,
+  AddCompetenceFormValues,
   CreateCompetenceDTO,
   EnrollStudentDTO,
   UpdateCourseInstanceDTO,
@@ -114,8 +114,8 @@ export const participantService = {
       { signal },
     ),
 
-  addCompetenceToInstructor: (id: string, dto: AddCompetenceDTO) =>
-    apiFetch<{ message: string }>(`/participants/${id}/competences`, {
+  addCompetenceToInstructor: (id: string, dto: AddCompetenceFormValues) =>
+    apiFetch<{ message: string }>(`/participants/competences`, {
       method: 'POST',
       body: JSON.stringify(dto),
     }),
@@ -220,7 +220,7 @@ export const courseInstanceService = {
     }),
 
   remove: (id: string) =>
-    apiFetch<void>(`/courseSessions/${id}`, {
+    apiFetch<void>(`/courseInstances/${id}`, {
       method: 'DELETE',
     }),
 

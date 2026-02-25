@@ -19,7 +19,7 @@ import { toast } from 'sonner';
 
 type Props = {
   courseInstanceId: string;
-  rowVersion: string; // Instance rowVersion
+  rowVersion: string;
 };
 
 const ManageEnrollmentsDialog = ({ courseInstanceId, rowVersion }: Props) => {

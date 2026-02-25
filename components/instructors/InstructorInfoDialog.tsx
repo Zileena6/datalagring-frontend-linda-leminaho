@@ -75,7 +75,6 @@ const InstructorInfoDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        {/* Instructor section */}
         <div className='grid gap-4'>
           {isInstructorPending ? <div>Loading instructor...</div> : null}
 
@@ -122,7 +121,6 @@ const InstructorInfoDialog = ({
             </div>
           ) : null}
 
-          {/* Competences */}
           <div className='rounded-md border p-4'>
             <div className='font-semibold mb-2'>Competences</div>
 
@@ -141,7 +139,6 @@ const InstructorInfoDialog = ({
             )}
           </div>
 
-          {/* Course instances */}
           <div className='rounded-md border p-4'>
             <div className='font-semibold mb-2'>Course instances</div>
 

@@ -71,7 +71,7 @@ const CreateCourseInstanceDialog = ({
       initialValues={initialValues}
       onSave={async (values) => {
         if (!values.courseCode) throw new Error('Select a course');
-        if (!values.locationName) throw new Error('Select a location');
+        if (!values.locationId) throw new Error('Select a location');
         if (!values.startDate) throw new Error('Select a start date');
         if (!values.endDate) throw new Error('Select an end date');
 
@@ -89,7 +89,7 @@ const CreateCourseInstanceDialog = ({
 
         const dto: CreateCourseInstanceDTO = {
           courseCode: values.courseCode,
-          locationName: values.locationName,
+          locationId: values.locationId,
           startDate: new Date(values.startDate).toISOString(),
           endDate: new Date(values.endDate).toISOString(),
           capacity,

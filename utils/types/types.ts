@@ -1,6 +1,4 @@
 export type ParticipantRole = 'Student' | 'Instructor';
-export type CourseType = 'BC' | 'AC';
-export type CourseTypeName = 'Basic Course' | 'Advanced Course';
 export type EnrollmentStatus = 'Pending' | 'Confirmed' | 'Cancelled';
 
 export type Competence = {

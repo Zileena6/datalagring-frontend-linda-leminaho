@@ -17,7 +17,7 @@ import { Trash2 } from 'lucide-react';
 import CreateCourseInstanceDialog from './CreateCourseInstanceDialog';
 import EditCourseInstanceDialog from './EditCourseInstanceDialog';
 import { toast } from 'sonner';
-import ManageEnrollmentsDialog from './ManageEnrollmentsDialog';
+// import ManageEnrollmentsDialog from './ManageEnrollmentsDialog';
 
 const CourseInstancesTable = () => {
   const queryClient = useQueryClient();
@@ -62,8 +62,8 @@ const CourseInstancesTable = () => {
             <TableHead>Location</TableHead>
             <TableHead>Instructors</TableHead>
             <TableHead>Capacity</TableHead>
-            <TableHead>Confirmed students</TableHead>
-            <TableHead>Enrollments</TableHead>
+            {/* <TableHead>Confirmed students</TableHead> */}
+            {/* <TableHead>Enrollments</TableHead> */}
             <TableHead />
           </TableRow>
         </TableHeader>
@@ -101,13 +101,13 @@ const CourseInstancesTable = () => {
 
               <TableCell>{instance.capacity}</TableCell>
 
-              <TableCell>{instance.confirmedEnrollmentsCount}</TableCell>
+              {/* <TableCell>{instance.confirmedEnrollmentsCount}</TableCell> */}
 
               <TableCell className='flex gap-3'>
-                <ManageEnrollmentsDialog
+                {/* <ManageEnrollmentsDialog
                   courseInstanceId={instance.id}
                   rowVersion={instance.rowVersion}
-                />
+                /> */}
                 <Trash2
                   className='cursor-pointer'
                   onClick={async () => {

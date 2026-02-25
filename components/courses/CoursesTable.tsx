@@ -73,8 +73,6 @@ const CoursesTable = () => {
         <TableHeader>
           <TableRow>
             <TableHead>Course</TableHead>
-            <TableHead>Course Type</TableHead>
-            <TableHead>Course Type Name</TableHead>
             <TableHead>Course Code</TableHead>
             <TableHead>Description</TableHead>
           </TableRow>
@@ -89,16 +87,6 @@ const CoursesTable = () => {
                 <TableCell>
                   <Link href={`/courses/${course.id}`}>
                     {course.courseName}
-                  </Link>
-                </TableCell>
-                <TableCell>
-                  <Link href={`/courses/${course.id}`}>
-                    {String(course.courseType)}
-                  </Link>
-                </TableCell>
-                <TableCell>
-                  <Link href={`/courses/${course.id}`}>
-                    {course.courseTypeName}
                   </Link>
                 </TableCell>
                 <TableCell>
@@ -141,7 +129,6 @@ const CoursesTable = () => {
                         courseCode: values.courseCode,
                         courseName: values.courseName,
                         description: values.description,
-                        courseType: values.courseType,
                         rowVersion: values.rowVersion,
                       };
 

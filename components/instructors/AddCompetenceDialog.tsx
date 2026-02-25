@@ -9,10 +9,7 @@ import { buildAddCompetenceToInstructor } from '@/components/forms/fieldBuilders
 
 import { participantService, competenceService } from '@/utils/action';
 import type { Competence } from '@/utils/types/types';
-import type {
-  AddCompetenceDTO,
-  AddCompetenceFormValues,
-} from '@/utils/types/dto';
+import type { AddCompetenceFormValues } from '@/utils/types/dto';
 
 type Props = {
   instructorId: string;
@@ -23,7 +20,7 @@ const AddCompetenceDialog = ({ instructorId, rowVersion }: Props) => {
   const queryClient = useQueryClient();
 
   const { data: competences = [] } = useQuery({
-    queryKey: ['competences'],
+    queryKey: ['participants', 'competences'],
     queryFn: ({ signal }) => competenceService.getAll(signal),
   });
 
@@ -34,14 +31,11 @@ const AddCompetenceDialog = ({ instructorId, rowVersion }: Props) => {
   );
 
   const addMutation = useMutation({
-    mutationFn: (p: { id: string; dto: AddCompetenceDTO }) =>
+    mutationFn: (p: { id: string; dto: AddCompetenceFormValues }) =>
       participantService.addCompetenceToInstructor(p.id, p.dto),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ['participants', 'instructors'],
-      });
-      await queryClient.invalidateQueries({
-        queryKey: ['participants', 'students'],
+        queryKey: ['participants', 'competences'],
       });
     },
   });
@@ -61,13 +55,14 @@ const AddCompetenceDialog = ({ instructorId, rowVersion }: Props) => {
       fields={fields}
       initialValues={initialValues}
       onSave={async (values) => {
-        const dto: AddCompetenceDTO = {
-          competenceName: values.competenceName,
+        const dto: AddCompetenceFormValues = {
+          participantId: values.participantId,
+          competenceId: values.competenceId,
           rowVersion: values.rowVersion,
         };
 
-        await toast.promise(
-          addMutation.mutateAsync({ id: values.instructorId, dto }),
+        toast.promise(
+          addMutation.mutateAsync({ id: values.participantId, dto }),
           {
             loading: 'Adding competence...',
             success: 'Competence added',

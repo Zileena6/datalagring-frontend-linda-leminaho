@@ -2,7 +2,6 @@ import type {
   Participant,
   Location,
   Course,
-  CourseType,
   CourseInstance,
   Competence,
 } from '@/utils/types/types';
@@ -141,20 +140,20 @@ const buildCompetenceEdit = (
   > = [
     { name: 'id', kind: 'hidden' },
     { name: 'rowVersion', kind: 'hidden' },
-    { name: 'name', label: 'Competence name', required: true },
+    { name: 'competenceName', label: 'Competence name', required: true },
   ];
 
   const initialValues: UpdateCompetenceFormValues = {
     id: c.id,
     rowVersion: c.rowVersion,
-    name: c.competenceName ?? '',
+    competenceName: c.competenceName ?? '',
   };
 
   return { fields, initialValues };
 };
 
 const buildAddCompetenceToInstructor = (
-  instructorId: string,
+  participantId: string,
   rowVersion: string,
   competences: Competence[],
 ): {
@@ -166,26 +165,26 @@ const buildAddCompetenceToInstructor = (
   const fields: Array<
     FormField<Extract<keyof AddCompetenceFormValues, string>, string>
   > = [
-    { name: 'instructorId', kind: 'hidden' },
+    { name: 'participantId', kind: 'hidden' },
     { name: 'rowVersion', kind: 'hidden' },
 
     {
       kind: 'select',
-      name: 'competenceName',
+      name: 'competenceId',
       label: 'Competence',
       required: true,
       placeholderOption: 'Select competence...',
       options: competences.map((c) => ({
         label: c.competenceName,
-        value: c.competenceName,
+        value: c.id,
       })),
     },
   ];
 
   const initialValues: AddCompetenceFormValues = {
-    instructorId,
+    participantId,
+    competenceId: '',
     rowVersion,
-    competenceName: '',
   };
 
   return { fields, initialValues };
@@ -246,10 +245,6 @@ const buildCourseEdit = (
     { name: 'courseName', label: 'Course', required: true },
     { name: 'courseCode', label: 'Course Code', required: true },
 
-    { name: 'courseType', label: 'Course Type', required: true },
-
-    { name: 'courseTypeName', label: 'Course Type Name', readOnly: true },
-
     { name: 'description', label: 'Course Description' },
   ];
 
@@ -259,17 +254,10 @@ const buildCourseEdit = (
     courseName: c.courseName,
     courseCode: c.courseCode,
     description: c.description,
-    courseType: c.courseType as CourseType,
-    courseTypeName: c.courseTypeName,
   };
 
   return { fields, initialValues };
 };
-
-const COURSE_TYPE_OPTIONS: Array<{ label: string; value: CourseType }> = [
-  { label: 'Basic', value: 'BC' },
-  { label: 'Advanced', value: 'AC' },
-];
 
 const buildCourseCreate = (): {
   fields: Array<
@@ -281,16 +269,7 @@ const buildCourseCreate = (): {
     FormField<Extract<keyof CreateCourseFormValues, string>, string>
   > = [
     { name: 'courseName', label: 'Course Name', required: true },
-
-    {
-      kind: 'select',
-      name: 'courseType',
-      label: 'Course Type',
-      required: true,
-      placeholderOption: 'Select course type...',
-      options: COURSE_TYPE_OPTIONS,
-    },
-
+    { name: 'courseCode', label: 'Course Code', required: true },
     {
       kind: 'textarea',
       name: 'description',
@@ -301,7 +280,7 @@ const buildCourseCreate = (): {
 
   const initialValues: CreateCourseFormValues = {
     courseName: '',
-    courseType: '',
+    courseCode: '',
     description: '',
   };
 
@@ -320,13 +299,13 @@ const buildCourseInstanceCreate = (
   initialValues: CreateCourseInstanceFormValues;
 } => {
   const courseOptions = courses.map((c) => ({
-    label: `${c.courseName} (${c.courseTypeName}) • ${c.courseCode}`,
+    label: `${c.courseName} • ${c.courseCode}`,
     value: c.courseCode,
   }));
 
   const locationOptions = locations.map((l) => ({
     label: l.locationName,
-    value: l.locationName,
+    value: l.id,
   }));
 
   const instructorOptions = instructors.map((i) => ({
@@ -347,7 +326,7 @@ const buildCourseInstanceCreate = (
     },
     {
       kind: 'select',
-      name: 'locationName',
+      name: 'locationId',
       label: 'Location',
       required: true,
       placeholderOption: 'Select location...',
@@ -384,7 +363,7 @@ const buildCourseInstanceCreate = (
 
   const initialValues: CreateCourseInstanceFormValues = {
     courseCode: '',
-    locationName: '',
+    locationId: '',
     startDate: '',
     endDate: '',
     capacity: '0',
@@ -395,7 +374,6 @@ const buildCourseInstanceCreate = (
 };
 
 const toDateTimeLocal = (iso: string): string => {
-  // ISO -> "YYYY-MM-DDTHH:mm" i lokal tid
   const d = new Date(iso);
   const pad = (n: number) => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(

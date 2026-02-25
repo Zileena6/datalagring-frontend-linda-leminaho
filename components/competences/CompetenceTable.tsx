@@ -111,10 +111,10 @@ const LocationsTable = () => {
                     onSave={(values) => {
                       const dto: UpdateCompetenceDTO = {
                         rowVersion: values.rowVersion,
-                        name: values.name,
+                        competenceName: values.competenceName,
                       };
                       updateMutation.mutate({ id: values.id, dto });
-                      console.log(values.rowVersion, values.name);
+                      console.log(values.rowVersion, values.competenceName);
                     }}
                   />
                 </TableCell>

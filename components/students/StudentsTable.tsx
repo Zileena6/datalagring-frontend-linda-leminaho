@@ -35,7 +35,6 @@ const StudentsTable = () => {
   } = useQuery({
     queryKey: ['participants', 'students'],
     queryFn: ({ signal }) => participantService.getAllStudents(signal),
-    staleTime: 5_000,
   });
 
   const updateMutation = useMutation({
@@ -130,7 +129,7 @@ const StudentsTable = () => {
                     description="Make changes to the student, and click save when you're done."
                     fields={fields}
                     initialValues={initialValues}
-                    onSave={(values) => {
+                    onSave={async (values) => {
                       const dto: UpdateParticipantDTO = {
                         firstName: values.firstName,
                         lastName: values.lastName,
@@ -141,7 +140,7 @@ const StudentsTable = () => {
                         rowVersion: values.rowVersion,
                       };
 
-                      updateMutation.mutate({ id: values.id, dto });
+                      await updateMutation.mutate({ id: values.id, dto });
                     }}
                   />
                 </TableCell>

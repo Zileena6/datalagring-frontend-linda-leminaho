@@ -1,4 +1,4 @@
-import { ParticipantRole, CourseType, EnrollmentStatus } from './types';
+import { ParticipantRole, EnrollmentStatus } from './types';
 
 // MARK: Participants
 export type UpdateParticipantDTO = {
@@ -42,7 +42,7 @@ export type CreateInstructorFormValues = {
 
 // MARK: Competences
 export type CreateCompetenceDTO = {
-  name: string;
+  competenceName: string;
 };
 
 export type CreateCompetenceFormValues = {
@@ -50,13 +50,13 @@ export type CreateCompetenceFormValues = {
 };
 
 export type UpdateCompetenceDTO = {
-  name?: string | null;
+  competenceName?: string | null;
   rowVersion: string;
 };
 
 export type UpdateCompetenceFormValues = {
   id: string;
-  name: string;
+  competenceName: string;
   rowVersion: string;
 };
 
@@ -64,11 +64,10 @@ export type AddCompetenceDTO = {
   competenceName: string;
   rowVersion: string;
 };
-
 export type AddCompetenceFormValues = {
-  competenceName: string;
+  participantId: string;
+  competenceId: string;
   rowVersion: string;
-  instructorId: string;
 };
 
 // MARK: Locations
@@ -97,8 +96,6 @@ export type UpdateCourseDTO = {
   courseName?: string | null;
   description?: string | null;
   rowVersion: string;
-
-  courseType?: CourseType | null;
 };
 
 export type UpdateCourseFormValues = {
@@ -107,23 +104,18 @@ export type UpdateCourseFormValues = {
   courseName: string;
   description: string;
   rowVersion: string;
-
-  courseType: CourseType;
-  courseTypeName: string;
 };
 
 export type CreateCourseDTO = {
+  courseCode: string;
   courseName: string;
   description: string;
-
-  courseType: CourseType;
 };
 
 export type CreateCourseFormValues = {
   courseName: string;
   description: string;
-
-  courseType: CourseType | '';
+  courseCode: string;
 };
 
 // MARK: CourseInstances
@@ -132,7 +124,7 @@ export type CreateCourseInstanceDTO = {
   endDate: string;
   courseCode: string;
   capacity: number;
-  locationName: string;
+  locationId: string;
 
   instructorIds: string[];
 };
@@ -142,7 +134,7 @@ export type CreateCourseInstanceFormValues = {
   endDate: string;
   courseCode: string;
   capacity: string;
-  locationName: string;
+  locationId: string;
   instructorIds: string;
 };
 

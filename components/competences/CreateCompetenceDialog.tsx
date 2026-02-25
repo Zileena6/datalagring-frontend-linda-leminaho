@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -38,10 +37,10 @@ const CreateCompetenceDialog = () => {
       initialValues={initialValues}
       onSave={async (values) => {
         const dto: CreateCompetenceDTO = {
-          name: values.name.trim(),
+          competenceName: values.name.trim(),
         };
 
-        if (!dto.name) throw new Error('Competence name is required');
+        if (!dto.competenceName) throw new Error('Competence name is required');
 
         await toast.promise(createMutation.mutateAsync(dto), {
           loading: 'Creating competence...',
